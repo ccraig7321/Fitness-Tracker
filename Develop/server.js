@@ -155,6 +155,8 @@ app.get("/exercise", (req, res) => {
     res.sendFile(__dirname + "/public/exercise.html")
 })
 
+// mongoose.Types.ObjectId[
+
 app.put("/api/workouts/:id", (req, res) => {
     console.log(req.body)
     db.Workout.findOneAndUpdate({_id: req.params.id}, { $push:{ exercises: [req.body] }}, {new: true})
@@ -169,40 +171,70 @@ app.put("/api/workouts/:id", (req, res) => {
 
 // .populate("exercises")
 
+// app.get("/api/workouts", (req, res) => {
+//     db.Workout.find()
+//     .then(dbResponse => {
+
+//     // OUTER LOOP: loop though dbResponse to loop through all the workout (looping through workouts/days of the week)
+//         let newWorkoutArray = [];
+
+//         for(let i =0; i < dbResponse; i++) {
+//         let newWorkoutObject;
+//         let totalDuration = 0; {
+//             for(let j=0; j < exercises.length; j++) {
+//                 totalDuration += exercises[j].duration;
+//             }
+        // newWorkoutObject.totalDuration = totalDuration,
+        // newWorkoutObject.day = dbResponse[i].day,
+        // newWorkoutObject.exercises = dbResponse[i].exercises
+          
+//             // INNER LOOP: Loops through all the exercises.
+//             //totalDuration += exercises[j].duration
+//             //INNER LOOP ENDS!!
+//         // OUTER LOOP, again:
+//             //Add total duration to newWorkoutObject.totalDuration = totalDuration, newWorkoutObject.day = dbResponse[i].day, newWorkoutObject.exercises = dbResponse[i].exercises
+//             // Push new object to newWorkoutArray
+//             // OUTER LOOP ends
+//     //     }
+
+//     //     console.log("Response", dbResponse);
+//         res.json(newWorkoutArray)
+//         // will later become:  res.json(newWorkoutArray) 
+//     })
+//     .catch(({ message }) => {
+//         console.log("error", message);
+//         res.send(400)
+//     });
+// });
+
 app.get("/api/workouts", (req, res) => {
-    db.Workout.find()
-    .then(dbResponse => {
-
-    // OUTER LOOP: loop though dbResponse to loop through all the workout (looping through workouts/days of the week)
-    //     let newWorkoutArray = [];
-
-    //     for(let i =0; i < dbResponse; i++) {
-    //         let newWorkoutObject;
-    //         let totalDuration = 0;
-            // INNER LOOP: Loops through all the exercises.
-            //totalDuration += exercises[j].duration
-            //INNER LOOP ENDS!!
-        // OUTER LOOP, again:
-            //Add total duration to newWorkoutObject.totalDuration = totalDuration, newWorkoutObject.day = dbResponse[i].day, newWorkoutObject.exercises = dbResponse[i].exercises
-            // Push new object to newWorkoutArray
-            // OUTER LOOP ends
-    //     }
-
-    //     console.log("Response", dbResponse);
-        res.json(dbResponse)
-        // will later become:  res.json(newWorkoutArray) 
-    })
-    .catch(({ message }) => {
-        console.log("error", message);
-        res.send(400)
-      });
-})
+    db.Workout.find({})
+        .then(dbResponse => {
+            let newWorkoutArray = [];
+            for (let i = 0; i < workout.length; i++) {
+                let newWorkoutObject;
+                let totalDuration = 0;
+                for (let j = 0; j < exercises.length; j++) {
+                    totalDuration += exercises[j].duration;
+                }
+                // newWorkoutObject = { day: workout[i].day, exercises: workout[i].exercises, totalDuration: totalDuration, _id: workout[i]._id }
+                newWorkoutObject.totalDuration = totalDuration,
+                newWorkoutObject.day = dbResponse[i].day,
+                newWorkoutObject.exercises = dbResponse[i].exercises;
+                newWorkoutArray.push(newWorkoutObject);
+            }
+            res.json(newWorkoutArray);
+        })
+        .catch(err => {
+            res.json(err);
+        });
+});
 
 
 
 app.get("/api/workouts/range", (req, res) => {
     // make limit 7 after find() 
-    db.Workout.find()
+    db.Workout.find().limit(7)
     .then(dbResponse => {
         console.log("Response", dbResponse);
         res.json(dbResponse)
