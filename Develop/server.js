@@ -18,6 +18,7 @@ app.use(express.static("public"));
 
 mongoose.connect( "mongodb://localhost/workout", { useNewUrlParser: true });
 
+mongoose.connect(process.env.MONGODB_URI);
 
 app.get("/", (req, res) => {
 
