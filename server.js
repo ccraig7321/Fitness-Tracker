@@ -16,9 +16,11 @@ app.use(express.json());
 
 app.use(express.static("public"));
 
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+
+
 // mongoose.connect( "mongodb://localhost/workout", { useNewUrlParser: true });
 
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 
 app.get("/", (req, res) => {
 
@@ -36,7 +38,7 @@ app.get("/exercise", (req, res) => {
 
 app.put("/api/workouts/:id", (req, res) => {
     console.log(req.body)
-    db.Workout.findOneAndUpdate({_id: req.params.id}, { $push:{ exercises: [req.body] }}, {new: true})
+    db.Workout.findByIdAndUpdate(req.params.id, { $push:{ exercises: [req.body] }}, {new: true})
     .then(dbWorkout => {
       res.json(dbWorkout);
     })
@@ -47,29 +49,29 @@ app.put("/api/workouts/:id", (req, res) => {
 })
 
 app.get("/api/workouts", (req, res) => {
-    db.Workout.find()
+    db.Workout.find({})
         .then(dbResponse => {
             let newWorkoutArray = [];
-            let totalDuration = 0;
             for (let i = 0; i < dbResponse.length; i++) {
+                let totalDuration = 0;
                 let newWorkoutObject = {};
                 for (let j = 0; j <  dbResponse[i].exercises.length; j++) {
                     totalDuration += dbResponse[i].exercises[j].duration;
                 }
-                newWorkoutObject.totalDuration = totalDuration,
-                newWorkoutObject.day = dbResponse[i].day,
+                newWorkoutObject._id = dbResponse[i]._id
+                newWorkoutObject.totalDuration = totalDuration;
+                newWorkoutObject.day = dbResponse[i].day;
                 newWorkoutObject.exercises = dbResponse[i].exercises;
                 console.log("Success!", newWorkoutObject);
                 newWorkoutArray.push(newWorkoutObject);
             }
+            console.log(newWorkoutArray)
             res.json(newWorkoutArray);
         })
         .catch(err => {
             res.json(err);
         });
 });
-
-
 
 app.get("/api/workouts/range", (req, res) => {
     // make limit 7 after find() 
